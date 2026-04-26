@@ -64,7 +64,7 @@ pip install matplotlib
 ### 2. Run the system
 
 ```bash
-python run_telemetry_demo.py
+python run_telemetry_dashboard.py
 ```
 
 ---
