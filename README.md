@@ -181,7 +181,7 @@ This project demonstrates a foundational version of a real-world telemetry pipel
 
 ## Demo
 
-![Telemetry Dashboard](Screenshot 2026-04-26 140720.png)
+![Telemetry Dashboard](Screenshot.png)
 
 ---
 
