@@ -1,21 +1,27 @@
-# Telemetry, Logging, and Real-Time Monitoring System
+# Rocket Telemetry Dashboard
+
+**Telemetry, Logging, and Real-Time Monitoring System**
+
+---
 
 ## Overview
 
-This project simulates a simplified aerospace telemetry system for a rocket hopper. It generates dummy flight data, streams it to a ground station, logs it reliably, and visualizes key parameters in real time.
+This project implements a simplified telemetry pipeline for a rocket hopper simulation. It demonstrates how flight data is generated, processed, logged, and visualized in real time, similar to a basic ground station system.
 
-The goal is to demonstrate system design thinking, handling of real-time data, and separation of concerns across components.
+The focus is on building a system that reflects real aerospace workflows, including continuous data streams, time synchronization, and reliable logging under real-time constraints.
 
 ---
 
 ## System Architecture
 
-The system is divided into two main parts:
+The system is implemented as a **single-process pipeline** for simplicity, but is structured to reflect a real telemetry system.
 
-### 1. Vehicle Side (Simulator)
+### Components
+
+#### Telemetry Generator (Vehicle Simulation)
 
 * Generates telemetry data at ~50–100 Hz
-* Parameters:
+* Simulated parameters:
 
   * Timestamp
   * Altitude
@@ -23,25 +29,37 @@ The system is divided into two main parts:
   * Acceleration
   * Orientation (Pitch, Roll, Yaw)
 
-### 2. Ground Station
+#### Processing Loop (Ground System)
 
-* Receives telemetry data
-* Logs data to a CSV file
-* Displays real-time plots
+* Handles incoming data in real time
+* Updates visualization
+* Logs telemetry continuously to file
+
+---
 
 ### Data Flow
 
-Vehicle Simulator → (Data Stream) → Ground Station → (Logging + Visualization)
+```
+Telemetry Generator → Processing Loop → Logging + Visualization
+```
+
+> Note: This implementation is single-process for simplicity, but the architecture is designed to be extended into a distributed system using UDP for vehicle-to-ground communication.
 
 ---
 
 ## Features
 
-* Real-time telemetry simulation
-* Continuous data streaming
-* Live visualization (Altitude, Velocity, Orientation)
-* Persistent logging to CSV
-* Modular structure for scalability
+* Real-time telemetry simulation (~50–100 Hz)
+* Live dashboard with multiple parameters:
+
+  * Altitude
+  * Velocity
+  * Acceleration
+  * Orientation (Pitch, Roll, Yaw)
+* Color-coded visualization for clarity
+* Continuous CSV logging (`telemetry_log.csv`)
+* Rolling time window for stable visualization
+* Live status panel displaying current telemetry values
 
 ---
 
@@ -58,10 +76,10 @@ Vehicle Simulator → (Data Stream) → Ground Station → (Logging + Visualizat
 ### 1. Install dependencies
 
 ```bash
-pip install matplotlib
+pip install -r requirements.txt
 ```
 
-### 2. Run the system
+### 2. Run the dashboard
 
 ```bash
 python run_telemetry_dashboard.py
@@ -71,80 +89,102 @@ python run_telemetry_dashboard.py
 
 ## Output
 
-### Live Dashboard
+### Real-Time Dashboard
 
-* Real-time updating plots for:
+* Multi-panel visualization with smooth updates
+* Dark theme optimized for readability
+* Color-coded signals:
 
-  * Altitude
-  * Velocity
-  * Orientation (Pitch)
+  * Altitude (cyan)
+  * Velocity (green)
+  * Acceleration (yellow)
+  * Orientation (multi-color)
 
-### Logged Data
+### Logged Telemetry
 
 * File: `telemetry_log.csv`
-* Contains timestamped telemetry data for post-analysis
+* Contains timestamped telemetry data
+* Suitable for post-flight analysis or replay systems
 
 ---
 
 ## Design Decisions
 
-### 1. CSV Logging
+### 1. Fixed-Rate Simulation Loop
 
-* Chosen for simplicity and readability
-* Easy to inspect and debug
-* Trade-off: Not optimal for very high data rates compared to binary formats
+A deterministic loop (~50–100 Hz) is used to simulate real flight computer timing, ensuring predictable and consistent data flow.
 
-### 2. Matplotlib for Visualization
+### 2. Continuous CSV Logging
 
-* Quick to implement and widely supported
-* Suitable for prototyping real-time systems
+* File remains open during execution for performance
+* Minimizes I/O overhead and avoids blocking
+* Trade-off: Not ideal for very high-throughput systems
+
+### 3. Matplotlib Dashboard
+
+* Chosen for rapid prototyping and simplicity
+* Provides real-time visualization with minimal setup
 * Trade-off: Limited scalability compared to web-based dashboards
 
-### 3. Single-Process Demo Version
+### 4. Rolling Buffer for Visualization
 
-* Simplifies execution and debugging
-* Combines simulation, logging, and visualization
-* Trade-off: Not fully representative of distributed systems
+* Maintains a fixed window of recent data
+* Prevents performance degradation over time
+* Ensures smooth and stable graph updates
 
 ---
 
 ## Handling Real-Time Constraints
 
-* Data generated at fixed intervals (~50–100 Hz)
-* Continuous loop ensures steady updates
-* Logging happens alongside visualization without blocking execution
+The system reflects key real-world considerations:
+
+* **Timing:** Fixed-rate loop approximates flight software cycles
+* **Continuity:** Logging and visualization run without interrupting data flow
+* **Traceability:** All telemetry is timestamped for post-flight analysis
 
 ---
 
 ## Limitations
 
-* No real network communication (in demo version)
+* No communication layer (UDP/TCP not implemented)
 * No packet loss or latency simulation
-* Limited scalability for high-frequency or large datasets
-* Basic visualization only
+* No fault tolerance or redundancy mechanisms
+* Visualization limited to local execution
 
 ---
 
 ## Future Improvements
 
-* Add UDP/TCP communication layer
-* Simulate packet loss and network latency
-* Implement asynchronous or buffered logging
-* Replace matplotlib with a web dashboard (e.g., Streamlit or Dash)
-* Add replay system for logged data
-* Introduce configuration files (YAML/JSON)
+To evolve toward a production-like telemetry system:
+
+* Implement UDP-based telemetry streaming
+* Simulate packet loss, latency, and jitter
+* Introduce asynchronous or buffered logging
+* Replace matplotlib with a web-based dashboard (Streamlit/Dash)
+* Add replay system for logged telemetry data
+* Improve physical realism of the simulation model
+
+---
+
+## Why This Matters
+
+In real rocket systems:
+
+* Telemetry is critical for **flight safety** and **post-flight analysis**
+* Ground systems must handle **continuous, high-frequency data streams**
+* Logging must be **reliable and non-blocking**
+* Visualization enables **real-time decision-making**
+
+This project demonstrates a foundational version of a real-world telemetry pipeline used in rocket flight systems.
 
 ---
 
 ## Demo
 
-(Add a screenshot here)
+![Telemetry Dashboard](screenshot.png)
 
 ---
 
-## Key Takeaways
+## Author Notes
 
-* Designed a modular telemetry pipeline
-* Worked with real-time data generation and visualization
-* Implemented continuous logging without interrupting execution
-* Considered real-world system constraints and trade-offs
+This implementation prioritizes clarity, reliability, and system design over complexity. The structure is intentionally modular so that features like networking, fault handling, and scalability can be added without major redesign.
